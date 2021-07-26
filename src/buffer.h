@@ -2,7 +2,6 @@
 
 #include <string>
 #include <iostream>
-#include <vector>
 #include <algorithm>
 
 #include <windows.h>
@@ -14,9 +13,8 @@ class Buffer
 {
     HANDLE  hConsole;
 public:
-    Buffer(int buffer_size)
-        : buffer_size(buffer_size),
-          buffer(buffer_size, ' ')
+    Buffer(size_t buffer_size)
+        : buffer(buffer_size, ' ')
     {
         hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
         PrintAndMoveCursorToPosition();
@@ -28,16 +26,8 @@ public:
         position = 0;
     }
 
-    void    Set(const std::vector<int> &new_buffer)
-    {
-        buffer_size = new_buffer.size();
-        buffer.resize(buffer_size);
-        std::transform(new_buffer.begin(), new_buffer.end(), buffer.begin(), [](auto v){return '0' + v;});
-    }
-
     void    Set(const std::string &new_buffer)
     {
-        buffer_size = new_buffer.size();
         buffer = new_buffer;
     }
 
@@ -49,13 +39,17 @@ public:
     void    Insert(char c)
     {
         buffer[position] = c;
-        
         MoveRight();
     }
-    
+
+    void    Set(char c)
+    {
+        buffer[position] = c;
+    }
+
     void    MoveRight()
     {
-        if (position <= buffer_size - 2)
+        if (position <= buffer.size() - 2)
         {
             ++position;
         }
@@ -72,13 +66,11 @@ public:
     void    Print()
     {
         std::cout << '\r' << '[';
-        for (auto i=0; i<buffer_size; ++i)
+        for (auto c : buffer)
         {
-            std::cout << Color(buffer[i]) << buffer[i] << console_color::reset;
+            std::cout << Color(c) << c << console_color::reset;
         }
         std::cout << ']';
-        //std::cout << " p: " << Position();
-        //std::cout << "    " << " ";
     }
 
     void    PrintAndMoveCursorToPosition()
@@ -87,180 +79,26 @@ public:
         MoveCursorToPosition();
     }
     
-    std::vector<int>    Get() const
+    auto    Get() const
     {
-        std::vector<int>    guess;
-        std::transform(buffer.begin(), buffer.end(), std::back_inserter(guess), [](auto c){return c - '0';});
-        return guess;
+        return buffer;
     }
-    
-    int     Position() const
+
+    auto    Position() const
     {
         return position;
     }
 
 
 private:
-    int     buffer_size{0};
-    int     position{0};
+    size_t     position{0};
     
     std::string buffer;
     
     void    MoveCursorToPosition() const
     {
-        std::cout << std::string(5 - Position(), '\b');
+        std::cout << std::string(buffer.size() + 1 - Position(), '\b');
     }
-    
-    void    SetColor(char value) const
-    {
-        switch (value)
-        {
-        default:
-            SetConsoleTextAttribute(hConsole,
-                                    0
-                                    | FOREGROUND_RED
-                                    | FOREGROUND_GREEN
-                                    | FOREGROUND_BLUE
-                                    //| BACKGROUND_RED
-                                    //| BACKGROUND_GREEN
-                                    //| BACKGROUND_BLUE
-                                    | FOREGROUND_INTENSITY
-                                    //| BACKGROUND_INTENSITY
-                                    );
-            break;
-        case '1':
-            SetConsoleTextAttribute(hConsole,
-                                    0
-                                    | FOREGROUND_RED
-                                    | FOREGROUND_GREEN
-                                    | FOREGROUND_BLUE
-                                    | BACKGROUND_RED
-                                    //| BACKGROUND_GREEN
-                                    //| BACKGROUND_BLUE
-                                    | FOREGROUND_INTENSITY
-                                    | BACKGROUND_INTENSITY
-                                    );
-            break;
-        case '2':
-            SetConsoleTextAttribute(hConsole,
-                                    0
-                                    | FOREGROUND_RED
-                                    | FOREGROUND_GREEN
-                                    | FOREGROUND_BLUE
-                                    //| BACKGROUND_RED
-                                    | BACKGROUND_GREEN
-                                    //| BACKGROUND_BLUE
-                                    | FOREGROUND_INTENSITY
-                                    | BACKGROUND_INTENSITY
-                                    );
-            break;
-        case '3':
-            SetConsoleTextAttribute(hConsole,
-                                    0
-                                    | FOREGROUND_RED
-                                    | FOREGROUND_GREEN
-                                    | FOREGROUND_BLUE
-                                    //| BACKGROUND_RED
-                                    //| BACKGROUND_GREEN
-                                    | BACKGROUND_BLUE
-                                    | FOREGROUND_INTENSITY
-                                    | BACKGROUND_INTENSITY
-                                    );
-            break;
-        case '4':
-            SetConsoleTextAttribute(hConsole,
-                                    0
-                                    //| FOREGROUND_RED
-                                    //| FOREGROUND_GREEN
-                                    //| FOREGROUND_BLUE
-                                    | BACKGROUND_RED
-                                    | BACKGROUND_GREEN
-                                    //| BACKGROUND_BLUE
-                                    //| FOREGROUND_INTENSITY
-                                    | BACKGROUND_INTENSITY
-                                    );
-            break;
-        case '5':
-            SetConsoleTextAttribute(hConsole,
-                                    0
-                                    | FOREGROUND_RED
-                                    | FOREGROUND_GREEN
-                                    | FOREGROUND_BLUE
-                                    | BACKGROUND_RED
-                                    //| BACKGROUND_GREEN
-                                    | BACKGROUND_BLUE
-                                    | FOREGROUND_INTENSITY
-                                    | BACKGROUND_INTENSITY
-                                    );
-            break;
-        case '6':
-            SetConsoleTextAttribute(hConsole,
-                                    0
-                                    //| FOREGROUND_RED
-                                    //| FOREGROUND_GREEN
-                                    //| FOREGROUND_BLUE
-                                    //| BACKGROUND_RED
-                                    | BACKGROUND_GREEN
-                                    | BACKGROUND_BLUE
-                                    //| FOREGROUND_INTENSITY
-                                    | BACKGROUND_INTENSITY
-                                    );
-            break;
-        case '7':
-            SetConsoleTextAttribute(hConsole,
-                                    0
-                                    | FOREGROUND_RED
-                                    | FOREGROUND_GREEN
-                                    | FOREGROUND_BLUE
-                                    //| BACKGROUND_RED
-                                    //| BACKGROUND_GREEN
-                                    //| BACKGROUND_BLUE
-                                    | FOREGROUND_INTENSITY
-                                    //| BACKGROUND_INTENSITY
-                                    );
-            break;
-        case '8':
-            SetConsoleTextAttribute(hConsole,
-                                    0
-                                    //| FOREGROUND_RED
-                                    //| FOREGROUND_GREEN
-                                    //| FOREGROUND_BLUE
-                                    | BACKGROUND_RED
-                                    | BACKGROUND_GREEN
-                                    | BACKGROUND_BLUE
-                                    //| FOREGROUND_INTENSITY
-                                    | BACKGROUND_INTENSITY
-                                    );
-            break;
-        case '9':
-            SetConsoleTextAttribute(hConsole,
-                                    0
-                                    | FOREGROUND_RED
-                                    | FOREGROUND_GREEN
-                                    | FOREGROUND_BLUE
-                                    | BACKGROUND_RED
-                                    | BACKGROUND_GREEN
-                                    | BACKGROUND_BLUE
-                                    | FOREGROUND_INTENSITY
-                                    | BACKGROUND_INTENSITY
-                                    );
-            break;
-        case '0':
-            SetConsoleTextAttribute(hConsole,
-                                    0
-                                    | FOREGROUND_RED
-                                    | FOREGROUND_GREEN
-                                    | FOREGROUND_BLUE
-                                    | BACKGROUND_RED
-                                    | BACKGROUND_GREEN
-                                    | BACKGROUND_BLUE
-                                    | FOREGROUND_INTENSITY
-                                    | BACKGROUND_INTENSITY
-                                    );
-            break;
-        }
-    }
-
     
     console_color::ConsoleColor    Color(char value) const
     {

@@ -1,4 +1,3 @@
-#include <vector>
 #include <string>
 #include <algorithm>
 #include <numeric>
@@ -13,22 +12,25 @@
 #include "buffer.h"
 #include "master_mind.h"
 
-int MasterMind2(int number_of_colors);
+int MasterMind2(size_t number_of_colors, size_t code_size);
 
 
 int main()
 {
     std::cout << "Velkommen til MasterMind :-)" << '\n';
     
-    int     number_of_colors{4};
-    std::cout << "Hvor mange 'farver' vil du spille med? Indtast tal: ";
+    size_t  number_of_colors{6};
+    std::cout << "Hvor mange 'farver' vil du spille med? Indtast tal [4-8]: ";
     std::cin >> number_of_colors;
-    std::cout << "Du valgte " << number_of_colors << " farver\n\n";
+
+    size_t  code_size{4};
+    std::cout << "Hvor lang en kode? Indtast tal [4-8]: ";
+    std::cin >> code_size;
 
     bool    done = false;
     while (!done)
     {
-        MasterMind2(number_of_colors);
+        MasterMind2(number_of_colors, code_size);
 
         //std::string answer;
         std::cout << "Vil du spille igen? [j/n]" << std::endl;
@@ -135,14 +137,14 @@ int main()
 //    return 0;
 //}
 
-int MasterMind2(int number_of_colors)
+int MasterMind2(size_t number_of_colors, size_t  code_size)
 {
-    mastermind::Mastermind  master_mind(number_of_colors, 4);
+    mastermind::Mastermind  master_mind(number_of_colors, code_size);
 
     //std::cout << " ";
     //master_mind.PrintCode();
 
-    Buffer  buffer(4);
+    Buffer  buffer(code_size);
     
     int     index{0};
     
@@ -172,6 +174,11 @@ int MasterMind2(int number_of_colors)
             
             //continue;
         }
+        else if (c == 8)  // back_space
+        {
+            buffer.Set(' ');
+            buffer.MoveLeft();
+        }
         else if (c == 13) // enter
         {
             ++index;
@@ -179,7 +186,6 @@ int MasterMind2(int number_of_colors)
             
             buffer.Print();
             response.Print();
-            //std::cout << " [" << response.AsString() << "]";
             
             if (response.Done())
             {
