@@ -12,13 +12,38 @@
 #include "buffer.h"
 #include "master_mind.h"
 
-int MasterMind(size_t number_of_colors, size_t code_size);
+int MasterMind(size_t number_of_colors, size_t code_size, bool use_letters);
 
+/**
+ * @brief Yes runs a infinite loop until user presses 'j' (yes) or 'n' (no) returns true if 'j' and false if 'n'.
+ * @return      true if user presses 'j', false if 'n'.
+ */
+bool    Yes()
+{
+    std::cout << " [j/n]";
+
+    while (true)
+    {
+        auto    answer = _getch();
+        if (answer == 'n' || answer == 'N')
+        {
+            std::cout << std::endl;
+            return false;
+        }
+        else if (answer == 'j' || answer == 'J' || answer == 'y' || answer == 'Y')
+        {
+            std::cout << std::endl;
+            return true;
+        }
+    }
+}
 
 int main()
 {
+
     std::cout << "Velkommen til MasterMind :-)" << '\n';
 
+    // SETUP:
     size_t  number_of_colors{6};
     std::cout << "Hvor mange 'farver' vil du spille med? Indtast tal [4-8]: ";
     std::cin >> number_of_colors;
@@ -27,9 +52,26 @@ int main()
     std::cout << "Hvor lang en kode? Indtast tal [4-" << number_of_colors << "]: ";
     std::cin >> code_size;
 
+    std::cout << "Vil du spille med bogstaver?";
+    bool    use_letters{false};
+    if (Yes())
+    {
+        use_letters = true;
+    }
 
     std::cout << "Mulige farver: \n";
-    Buffer(std::string("1234567890").substr(0, number_of_colors)).Print();
+    std::string base(number_of_colors, ' ');
+    if (use_letters)
+    {
+        std::iota(base.begin(), base.end(), 'a');
+    }
+    else
+    {
+        std::iota(base.begin(), base.end(), '1');
+    }
+    Buffer(base).Print();
+
+    // INSTRUCTIONS:
     std::cout << std::endl;
     std::cout << std::endl;
     std::cout << "Indtast dit gaet. Kun eet af hvert tal er muligt!\n"
@@ -44,12 +86,11 @@ int main()
               << std::endl;
     std::cout << std::endl;
 
-
     bool    done = false;
     while (!done)
     {
         try {
-            MasterMind(number_of_colors, code_size);
+            MasterMind(number_of_colors, code_size, use_letters);
         } catch (std::exception &e)
         {
             std::cout << "ERROR: " << e.what() << std::endl;
@@ -57,30 +98,20 @@ int main()
         }
 
         //std::string answer;
-        std::cout << "Vil du spille igen? [j/n]" << std::endl;
-        while (true)
+        std::cout << "Vil du spille igen?";
+        if (!Yes())
         {
-            auto    answer = _getch();
-            //std::cin >> answer;
-            if (answer == 'n' || answer == 'N')
-            {
-                done = true;
-                std::cout << "\nFarvel og tak :-)" << std::endl;
-                break;
-            }
-            else if (answer == 'j' || answer == 'J')
-            {
-                break;
-            }
+            done = true;
+            std::cout << "\nFarvel og tak :-)" << std::endl;
         }
     }
 
     return 0;
 }
 
-int MasterMind(size_t number_of_colors, size_t  code_size)
+int MasterMind(size_t number_of_colors, size_t  code_size, bool use_letters)
 {
-    mastermind::Mastermind  master_mind(number_of_colors, code_size);
+    mastermind::Mastermind  master_mind(number_of_colors, code_size, use_letters);
 
     //std::cout << " ";
     //master_mind.PrintCode();
@@ -99,8 +130,7 @@ int MasterMind(size_t number_of_colors, size_t  code_size)
             std::cout << '\n' << "Afslutter..." << std::endl;
             break;
         }
-
-        if (c == 224) // special keys
+        else if (c == 224) // special keys
         {
             auto c = _getch();
 
@@ -129,7 +159,7 @@ int MasterMind(size_t number_of_colors, size_t  code_size)
             buffer.Print();
             response.Print();
 
-            if (response.Done())
+            if (response.IsDone())
             {
                 if (index <= 2)
                 {
@@ -153,7 +183,14 @@ int MasterMind(size_t number_of_colors, size_t  code_size)
             buffer.Reset();
             std::cout << '\n';
         }
-        else if (c > '0' && c <= ('0' + number_of_colors))
+        else if (!use_letters && c > '0' && c <= ('0' + number_of_colors))
+        {
+            if (!buffer.Has(c))
+            {
+                buffer.Insert(c);
+            }
+        }
+        else if (use_letters && c >= 'a' && c < ('a' + number_of_colors))
         {
             if (!buffer.Has(c))
             {

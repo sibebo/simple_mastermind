@@ -20,11 +20,18 @@ class Mastermind
     std::string     code;       ///< holding the code to guess.
 
 public:
-    Mastermind(size_t number_of_colors, size_t code_size)
+    Mastermind(size_t number_of_colors, size_t code_size, bool use_letters)
         : base(number_of_colors, ' '),
           code(code_size, ' ')
     {
-        std::iota(base.begin(), base.end(), '1');
+        if (use_letters)
+        {
+            std::iota(base.begin(), base.end(), 'a');
+        }
+        else
+        {
+            std::iota(base.begin(), base.end(), '1');
+        }
         Shuffle();
     }
 
