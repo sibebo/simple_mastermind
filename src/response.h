@@ -22,7 +22,7 @@ public:
         off_count = off;
     }
 
-    bool    Done() const
+    bool    IsDone() const
     {
         return (match_count == code_size);
     }
