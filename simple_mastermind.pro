@@ -13,4 +13,6 @@ SOURCES += \
     src/simple_mastermind.cpp
 
 OTHER_FILES += \
-    README.md
+    README.md \
+    .gitignore \
+    CMakeLists.txt
