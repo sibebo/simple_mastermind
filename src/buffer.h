@@ -6,24 +6,28 @@
 
 #include <windows.h>
 
-
 #include "console_colors.h"
 
 class Buffer
 {
-    HANDLE  hConsole;
 public:
     Buffer(size_t buffer_size)
         : buffer(buffer_size, ' ')
-    {
-        hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-        PrintAndMoveCursorToPosition();
-    }
-    
+    {}
+
+    Buffer(const std::string &buffer)
+        : buffer(buffer)
+    {}
+
     void    Reset()
     {
-        transform(buffer.begin(), buffer.end(), buffer.begin(), [](auto c){return ' ';});
+        std::fill(buffer.begin(), buffer.end(), ' ');
         position = 0;
+    }
+
+    auto    Get() const
+    {
+        return buffer;
     }
 
     void    Set(const std::string &new_buffer)
@@ -62,7 +66,7 @@ public:
             --position;
         }
     }
-    
+
     void    Print()
     {
         std::cout << '\r' << '[';
@@ -78,11 +82,6 @@ public:
         Print();
         MoveCursorToPosition();
     }
-    
-    auto    Get() const
-    {
-        return buffer;
-    }
 
     auto    Position() const
     {
@@ -92,14 +91,14 @@ public:
 
 private:
     size_t     position{0};
-    
+
     std::string buffer;
-    
+
     void    MoveCursorToPosition() const
     {
         std::cout << std::string(buffer.size() + 1 - Position(), '\b');
     }
-    
+
     console_color::ConsoleColor    Color(char value) const
     {
         switch (value)
@@ -128,5 +127,5 @@ private:
             return console_color::reset;
         }
     }
-    
+
 };

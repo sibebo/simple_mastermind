@@ -37,14 +37,14 @@ public:
     {
         std::cout << code << std::endl;
     }
-    
+
     void    Shuffle()
-    {    
+    {
         auto seed = std::chrono::system_clock::now().time_since_epoch().count();
         std::shuffle(base.begin(), base.end(), std::default_random_engine(seed));
         std::copy_n(base.begin(), code.size(), code.begin());
     }
-    
+
     Response    Check(const std::string &guess)
     {
         if (guess.size() != code.size()) throw std::runtime_error("Guess size does not match code size!!!");
