@@ -16,7 +16,7 @@ int MasterMind(size_t number_of_colors, size_t code_size, bool use_letters);
 
 /**
  * @brief Yes runs a infinite loop until user presses 'j' (yes) or 'n' (no) returns true if 'j' and false if 'n'.
- * @return      true if user presses 'j', false if 'n'.
+ * @return      true if user presses 'j' (or 'y'), false if 'n'.
  */
 bool    Yes()
 {
@@ -38,6 +38,10 @@ bool    Yes()
     }
 }
 
+/**
+ * @brief main is the main entry of the application. It Asks the user for startup info and presents some instructions before running into the game loop.
+ * @return 0
+ */
 int main()
 {
 
@@ -109,6 +113,13 @@ int main()
     return 0;
 }
 
+/**
+ * @brief MasterMind is the event (key input) handler. It initializes the game and runs until game completion or forced exits.
+ * @param number_of_colors  number of available colors.
+ * @param code_size         size of the code
+ * @param use_letters       if true, letters are used (from 'a'). If false, numbers are used (from '1').
+ * @return                  0
+ */
 int MasterMind(size_t number_of_colors, size_t  code_size, bool use_letters)
 {
     mastermind::Mastermind  master_mind(number_of_colors, code_size, use_letters);
@@ -119,20 +130,21 @@ int MasterMind(size_t number_of_colors, size_t  code_size, bool use_letters)
     Buffer  buffer(code_size);
     buffer.PrintAndMoveCursorToPosition();
 
-    int     index{0};
+    int     row_counter{0};
 
-    while (true)
+    // KEY EVENT LOOP:
+    while (true)                // Runs infinitly - until break somewhere...
     {
-        auto c = _getch();
+        auto c = _getch();      // Getting the input character off the input buffer.
 
-        if (c == 27)    // escape
+        if (c == 27)            // ESCAPE - end the game
         {
             std::cout << '\n' << "Afslutter..." << std::endl;
-            break;
+            break;              // Breaking out of the loop.
         }
-        else if (c == 224) // special keys
+        else if (c == 224)      // special keys...
         {
-            auto c = _getch();
+            auto c = _getch();  // Getting the extra input character off the input buffer.
 
             switch (c)
             {
@@ -143,65 +155,57 @@ int MasterMind(size_t number_of_colors, size_t  code_size, bool use_letters)
                 buffer.MoveRight();
                 break;
             }
-
-            //continue;
         }
-        else if (c == 8)  // back_space
+        else if (c == 8)        // BACK_SPACE - acting as left arrow.
         {
             //buffer.Set(' ');
             buffer.MoveLeft();
         }
-        else if (c == 13) // enter
+        else if (c == 13)       // ENTER. Check the guess against the code.
         {
-            ++index;
+            ++row_counter;
             auto    response = master_mind.Check(buffer.Get());
 
             buffer.Print();
             response.Print();
 
-            if (response.IsDone())
+            if (response.IsDone())  // If code is guessed...
             {
-                if (index <= 2)
+                if (row_counter <= 2)
                 {
-                    std::cout << '\n' << "Hahahaha - rent held!!!\nIalt " << index << " traek" << std::endl;
+                    std::cout << '\n' << "Hahahaha - rent held!!!\nIalt " << row_counter << " traek" << std::endl;
                 }
-                else if (index <= 4)
+                else if (row_counter <= 4)
                 {
-                    std::cout << '\n' << "Fantastisk!!! Godt gaaet!!!\nIalt " << index << " traek" << std::endl;
+                    std::cout << '\n' << "Fantastisk!!! Godt gaaet!!!\nIalt " << row_counter << " traek" << std::endl;
                 }
-                else if (index <= 8)
+                else if (row_counter <= 8)
                 {
-                    std::cout << '\n' << "Godt gaaet!!!\nIalt " << index << " traek" << std::endl;
+                    std::cout << '\n' << "Godt gaaet!!!\nIalt " << row_counter << " traek" << std::endl;
                 }
                 else
                 {
-                    std::cout << '\n' << "Godt gaaet - bedre held naeste gang!!!\nIalt " << index << " traek" << std::endl;
+                    std::cout << '\n' << "Godt gaaet - bedre held naeste gang!!!\nIalt " << row_counter << " traek" << std::endl;
                 }
-                break;
+                break;          // code is guessed - break the loop.
             }
 
-            buffer.Reset();
-            std::cout << '\n';
+            buffer.Reset();     // Reset buffer to prepare for new guess...
+            std::cout << '\n';  // ... at e new row.
         }
-        else if (!use_letters && c > '0' && c <= ('0' + number_of_colors))
+        else if ((!use_letters && c > '0' && c <= ('0' + number_of_colors))     // numeric characters > '0'
+                 || (use_letters && c >= 'a' && c < ('a' + number_of_colors)))  // or... letters >= 'a'
         {
             if (!buffer.Has(c))
             {
                 buffer.Insert(c);
             }
         }
-        else if (use_letters && c >= 'a' && c < ('a' + number_of_colors))
-        {
-            if (!buffer.Has(c))
-            {
-                buffer.Insert(c);
-            }
-        }
-        else if (c == ' ')
+        else if (c == ' ')      // SPACE - to clear a position
         {
             buffer.Insert(c);
         }
-        else if (c == 'r')
+        else if (c == 'r')      // KEY 'r' to reset buffer
         {
             buffer.Reset();
             buffer.Print();
