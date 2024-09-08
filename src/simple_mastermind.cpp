@@ -44,7 +44,6 @@ bool    Yes()
  */
 int main()
 {
-
     std::cout << "Velkommen til MasterMind :-)" << '\n';
 
     // SETUP:
@@ -57,13 +56,9 @@ int main()
     std::cin >> code_size;
 
     std::cout << "Vil du spille med bogstaver?";
-    bool    use_letters{false};
-    if (Yes())
-    {
-        use_letters = true;
-    }
+    auto use_letters = Yes();
 
-    std::cout << "Mulige farver: \n";
+    // Setting up the palette:
     std::string base(number_of_colors, ' ');
     if (use_letters)
     {
@@ -73,6 +68,7 @@ int main()
     {
         std::iota(base.begin(), base.end(), '1');
     }
+    std::cout << "Mulige farver: \n";
     Buffer(base).Print();
 
     // INSTRUCTIONS:
