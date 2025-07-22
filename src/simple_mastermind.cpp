@@ -79,6 +79,9 @@ int main()
                  "Slet et tal ved at trykke paa melllemrumstasten.\n"
                  "Flyt cursoren med piletasterne.\n"
                  "Nulstil skrivefeltet med tryk paa r-tasten.\n"
+                 "Efter hvert gaet faar du et svar:\n"
+                 "  + betyder, at farven er rigtig, men den staar forkert\n"
+                 "  # betyder, at farven er rigtig og staar rigtigt\n"
                  "Afslut spillet ved at vinde - eller ved at trykke paa escape-tasten."
               << std::endl;
     std::cout << std::endl;
