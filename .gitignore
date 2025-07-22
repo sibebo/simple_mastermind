@@ -1,4 +1,8 @@
 *.pro.user
 *.exe
+*.depend
+*.layout
 
 build*/*
+obj/
+
